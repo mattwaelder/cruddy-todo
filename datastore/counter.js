@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const sprintf = require('sprintf-js').sprintf;
 
-var counter = 0;
+// var counter = 0;
 
 // Private helper functions ////////////////////////////////////////////////////
 
@@ -18,9 +18,10 @@ const zeroPaddedNumber = (num) => {
 const readCounter = (callback) => {
   fs.readFile(exports.counterFile, (err, fileData) => {
     if (err) {
-      callback(null, 0);
+      // callback(null, 0);
+      throw new Error('error reading counter');
     } else {
-      callback(null, Number(fileData));
+      callback(err, Number(fileData));
     }
   });
 };
@@ -38,13 +39,30 @@ const writeCounter = (count, callback) => {
 
 // Public API - Fix this function //////////////////////////////////////////////
 
-exports.getNextUniqueId = () => {
-  counter = counter + 1;
-  return zeroPaddedNumber(counter);
+//purpose: make new unique id, add unique id to txt file, pass unique id to index.js
+exports.getNextUniqueId = (callback) => {
+  //saves a file into data with content = to current count
+
+  //1 read current counter
+  //readcounter(callback(err, success))
+  readCounter((err, num) => {// read the file
+    if (err) {// if we cant read the file throw an error
+      throw new Error('FAILURE')
+    } else {
+      //writeCounter(count, successCallback(err, success))
+      let nextNum = num+1
+      writeCounter(nextNum, (err, num => {//if you can read the file write a new unique id
+        if(err) {
+          throw new Error('FAILURE')//if we cant write to the file throw an error
+        } else {
+          callback(null, zeroPaddedNumber(nextNum));//return a call back with zeropadded #
+        }
+      }))
+    }
+  })
 };
 
 
 
-// Configuration -- DO NOT MODIFY //////////////////////////////////////////////
-
+// Configuration -- DO NOT MODIFY ///////////`///////////////////////////////////
 exports.counterFile = path.join(__dirname, 'counter.txt');
