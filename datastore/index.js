@@ -28,11 +28,6 @@ exports.create = (text, callback) => {
 //i think we want an array of these
 //file looks like { id: '00001', text: 'buy chocolate' }
 exports.readAll = (callback) => {
-  // var data = _.map(items, (text, id) => {
-  //   return { id, text };
-  // });
-  // callback(null, data);
-
   //iterating through storage
   fs.readdir(exports.dataDir, (err, files) => {
     if (err) {
@@ -41,20 +36,24 @@ exports.readAll = (callback) => {
       let todoArray = [];
       files.forEach((file) => {
         let uId = file.slice(0, 5);
-        todoArray.push({id: uId, text: uId});//instead of pushing entire file figure out to push text only
+        todoArray.push({id: uId, text: uId});
       })
       callback(null, todoArray);
     }
   })
 };
 
+//Todo.readOne(req.params.id, (err, todo) => {}
 exports.readOne = (id, callback) => {
-  var text = items[id];
-  if (!text) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback(null, { id, text });
-  }
+  let todoPath = path.join(exports.dataDir, `${id}.txt`)
+
+  fs.readFile(todoPath, 'utf8', (err, data) => {
+    if (err) {
+      callback(err)
+    } else {
+      callback(null, {id: id, text: data})
+    }
+  })
 };
 
 exports.update = (id, text, callback) => {
