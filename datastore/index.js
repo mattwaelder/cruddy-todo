@@ -56,25 +56,50 @@ exports.readOne = (id, callback) => {
   })
 };
 
+//Todo.update(req.params.id, req.body.todoText, (err, todo) => {}
 exports.update = (id, text, callback) => {
-  var item = items[id];
-  if (!item) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    items[id] = text;
-    callback(null, { id, text });
-  }
+  let filePath = path.join(exports.dataDir, `${id}.txt`)
+
+  fs.readFile(filePath, (err, data) => {
+    if(err) {
+      callback(err);
+    } else {
+      //write file of id:id with new text
+      fs.writeFile(filePath, text, (err, data) => {
+        if (err) {
+          callback(err);
+        } else {
+          callback(null, {id: id, text: text})
+        }
+      })
+    }
+  })
 };
 
 exports.delete = (id, callback) => {
-  var item = items[id];
-  delete items[id];
-  if (!item) {
-    // report an error if item not found
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback();
-  }
+  // var item = items[id];
+  // delete items[id];
+  // if (!item) {
+  //   // report an error if item not found
+  //   callback(new Error(`No item with id: ${id}`));
+  // } else {
+  //   callback();
+  // }
+  let filePath = path.join(exports.dataDir, `${id}.txt`)
+
+  fs.readFile(filePath, (err, data) => {
+    if (err) {
+      callback(err);
+    } else {
+      fs.unlink(filePath, (err, data) => {
+        if (err) {
+          callback(err)
+        } else {
+          callback(null, {})
+        }
+      })
+    }
+  })
 };
 
 // Config+Initialization code -- DO NOT MODIFY /////////////////////////////////
