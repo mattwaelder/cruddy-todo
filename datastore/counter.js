@@ -18,8 +18,8 @@ const zeroPaddedNumber = (num) => {
 const readCounter = (callback) => {
   fs.readFile(exports.counterFile, (err, fileData) => {
     if (err) {
-      // callback(null, 0);
-      throw new Error('error reading counter');
+      callback(null, 0);
+      // throw new Error('error reading counter');
     } else {
       callback(err, Number(fileData));
     }
@@ -45,20 +45,20 @@ exports.getNextUniqueId = (callback) => {
 
   //1 read current counter
   //readcounter(callback(err, success))
-  readCounter((err, num) => {// read the file
-    if (err) {// if we cant read the file throw an error
-      throw new Error('FAILURE')
-    } else {
+  readCounter((err, curr) => {// read the file
       //writeCounter(count, successCallback(err, success))
-      let nextNum = num+1
-      writeCounter(nextNum, (err, num => {//if you can read the file write a new unique id
-        if(err) {
-          throw new Error('FAILURE')//if we cant write to the file throw an error
-        } else {
-          callback(null, zeroPaddedNumber(nextNum));//return a call back with zeropadded #
-        }
-      }))
-    }
+      // let nextNum = curr
+      if (err) {
+        callback(err)
+      } else {
+        writeCounter(curr+1, (err, uniqId) => {//if you can read the file write a new unique id
+          if (err) {
+            callback(err)
+          } else {
+            callback(null, uniqId);//return a call back with zeropadded #
+          }
+        })
+      }
   })
 };
 
