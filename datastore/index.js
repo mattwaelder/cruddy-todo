@@ -34,10 +34,24 @@ exports.readAll = (callback) => {
       callback(err)
     } else {
       let todoArray = [];
-      files.forEach((file) => {
-        let uId = file.slice(0, 5);
-        todoArray.push({id: uId, text: uId});
+      files.map((file) => {
+        let currPath = path.join(exports.dataDir, `${file}`);
+        fs.readFile(currPath, (err, text) => {
+          if (err) {
+            console.log('ERROR')
+            callback(err);
+          } else {
+            console.log('NO ERROR')
+            let uId = file.slice(0, 5);
+            todoArray.push({
+              id: uId,
+              text: text.toString()
+            });
+            console.log(todoArray)
+          }
+        })
       })
+      console.log(todoArray)
       callback(null, todoArray);
     }
   })
